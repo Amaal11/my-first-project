@@ -1,122 +1,165 @@
 import 'package:flutter/material.dart';
+import 'amaal/amaal_color.dart';
+import 'amaal/amaal_text.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(const AmaalApp());
 }
 
-class MyApp extends StatelessWidget {
+class AmaalApp extends StatelessWidget {
+  const AmaalApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      debugShowCheckedModeBanner: false,
       home: LoginScreen(),
+      debugShowCheckedModeBanner: false,
     );
   }
 }
 
-class LoginScreen extends StatelessWidget {
+class LoginScreen extends StatefulWidget {
+  @override
+  _LoginScreenState createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
+  final _formKey = GlobalKey<FormState>();
+  final _emailController = TextEditingController();
+  final _phoneController = TextEditingController();
+  final _passwordController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Stack(
-          children: [
-            Container(
-              decoration: BoxDecoration(
-                image: DecorationImage(
-                  image: AssetImage('assets/a.jpg'),
-                  fit: BoxFit.cover,
-                ),
-              ),
-            ),
-            Container(
-              color: Colors.black.withOpacity(0.7),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-
-                    SizedBox(height: 16),
-                    Container(
-                      padding: EdgeInsets.all(20),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.3),
-                        borderRadius: BorderRadius.circular(30.0),
-                      ),
-                      child: Column(
-                        children: [
-                          SizedBox(height: 19),
-                          TextField(
-                            key: Key('amaal_name_txt'),
-                            style: TextStyle(color: Colors.white),
-                            decoration: InputDecoration(
-                              labelText: 'Name',
-                              labelStyle: TextStyle(color: Colors.white),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(30.0),
-                                borderSide: BorderSide(color: Colors.white),
-                              ),
-                              filled: true,
-                              fillColor: Colors.white.withOpacity(0.1),
-                            ),
-                          ),
-                          SizedBox(height: 16),
-                          TextField(
-                            key: Key('amaal_pass_txt'),
-                            style: TextStyle(color: Colors.white),
-                            decoration: InputDecoration(
-                              labelText: 'Password',
-                              labelStyle: TextStyle(color: Colors.white),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(30.0),
-                                borderSide: BorderSide(color: Colors.white),
-                              ),
-                              filled: true,
-                              fillColor: Colors.white.withOpacity(0.1),
-                            ),
-                            obscureText: true,
-                          ),
-                          SizedBox(height: 24),
-                          ElevatedButton(
-                            key: Key('amaal_login_btn'),
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(builder: (context) => HomeScreen()),
-                              );
-
-                            },
-                            style: ElevatedButton.styleFrom(
-                              foregroundColor: Colors.white, minimumSize: Size(250, 50), backgroundColor: Colors.black54,
-                            ),
-                            child: Text('Login'),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ],
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: amaalColors.backgroundGradient,
         ),
-      );
+
+
+        child: Center(
+
+          child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: SingleChildScrollView(
+
+                child: Form(
+
+                  key: _formKey,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+
+                    children: [
+                      Image.asset('assets/images/img_1.png',
+                        width:150 ,height: 150,
+                      ),
+                      const SizedBox(
+                        height: 50,),
+                      TextFormField(
+                        controller: _emailController,
+                        decoration: InputDecoration(
+                          labelText: amaalTexts.emailHint,
+                          border: OutlineInputBorder(),
+                        ),
+                        validator: (value) {
+                          if (value == null || !value.contains('@')) {
+                            return 'Please enter a valid email address.';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 16),
+                      TextFormField(
+                        controller: _phoneController,
+                        keyboardType: TextInputType.phone,
+                        decoration: InputDecoration(
+                          labelText: amaalTexts.phoneHint,
+                          border: OutlineInputBorder(),
+                        ),
+                        validator: (value) {
+                          if (value == null || value.length < 9 || !RegExp(r'^\d+$').hasMatch(value)) {
+                            return 'Please enter a valid phone number.';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 16),
+                      TextFormField(
+                        controller: _passwordController,
+                        obscureText: true,
+                        decoration: InputDecoration(
+                          labelText: amaalTexts.passwordHint,
+                          border: OutlineInputBorder(),
+                        ),
+                        validator: (value) {
+                          if (value == null ||
+                              !RegExp(r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$')
+                                  .hasMatch(value)) {
+                            return 'Password must contain uppercase, lowercase, numbers, and symbols.';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 24),
+                      ElevatedButton(
+                        onPressed: () {
+                          if (_formKey.currentState!.validate()) {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => DetailsScreen(
+                                  email: _emailController.text,
+                                  phone: _phoneController.text,
+                                  password: _passwordController.text,
+                                ),
+                              ),
+                            );
+                          }
+                        },
+                        child: Text(amaalTexts.loginButton),
+                      ),
+                    ],
+                  ),
+                ),
+              )
+          ),
+
+        ),
+      ),
+    );
   }
 }
 
-class HomeScreen extends StatelessWidget {
+class DetailsScreen extends StatelessWidget {
+  final String email;
+  final String phone;
+  final String password;
+
+  const DetailsScreen({
+    Key? key,
+    required this.email,
+    required this.phone,
+    required this.password,
+  }) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('الشاشة الرئيسية'),
+        title: const Text('User Details'),
       ),
-      body: Center(
-        child: Text(
-          'مرحبًا بك في الشاشة الرئيسية!',
-          style: TextStyle(fontSize: 20),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Email: $email'),
+            const SizedBox(height: 8),
+            Text('Phone: $phone'),
+            const SizedBox(height: 8),
+            Text('Password: $password'),
+          ],
         ),
       ),
     );
